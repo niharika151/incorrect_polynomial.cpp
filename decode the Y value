@@ -1,46 +1,122 @@
 #include <iostream>
-#include <vector>
-#include <string>
 #include <map>
+#include <string>
+#include <cmath>
+#include <vector>
 #include <sstream>
 
-// Function to decode a value from a given base
-long long decodeValue(const std::string& value, int base) {
+using namespace std;
+
+// Function to decode a value from a given base to base 10
+long long decodeValue(const string &value, int base) {
     long long result = 0;
-    for (char c : value) {
-        result *= base;
-        if (c >= '0' && c <= '9') result += c - '0';
-        else result += c - 'A' + 10;
+    long long power = 1;
+    for (int i = value.length() - 1; i >= 0; --i) {
+        if (isdigit(value[i])) {
+            result += (value[i] - '0') * power;
+        } else if (isalpha(value[i])) {
+            result += (toupper(value[i]) - 'A' + 10) * power;
+        }
+        power *= base;
     }
     return result;
 }
 
-int main() {
-    std::map<int, std::pair<int, std::string>> roots = {
-        {1, {10, "28735619723837"}},
-        {2, {16, "1A228867F0CA"}},
-        {3, {12, "32811A4AA0B7B"}},
-        {4, {11, "917978721331A"}},
-        {5, {16, "1A22886782E1"}},
-        {6, {10, "28735619654702"}},
-        {7, {14, "71AB5070CC4B"}},
-        {8, {9, "122662581541670"}},
-        {9, {8, "642121030037605"}}
-    };
+// Function to apply Lagrange Interpolation to find f(x)
+double lagrangeInterpolation(const map<int, long long>& points, int x_value) {
+    double result = 0.0;
 
-    std::vector<int> x;
-    std::vector<double> y;
+    // Iterate over each point (x_i, y_i)
+    for (auto &p1 : points) {
+        int x_i = p1.first;
+        long long y_i = p1.second;
 
-    for (const auto& [key, val] : roots) {
-        int base = val.first;
-        std::string value = val.second;
-        x.push_back(key);
-        y.push_back(decodeValue(value, base));
+        // Calculate the Lagrange basis polynomial for this point
+        double term = y_i;
+        for (auto &p2 : points) {
+            int x_j = p2.first;
+            if (x_i != x_j) {
+                term *= (x_value - x_j) / (double)(x_i - x_j);
+            }
+        }
+
+        // Add this term to the result
+        result += term;
     }
 
-    // Print the decoded values
-    for (size_t i = 0; i < x.size(); ++i) {
-        std::cout << "x = " << x[i] << ", y = " << y[i] << std::endl;
+    return result;
+}
+
+int main() {
+    // Example input from the problem statement
+    map<string, map<string, string>> inputData = {
+        {"keys", {{"n", "9"}, {"k", "6"}}},
+        {"1", {{"base", "10"}, {"value", "28735619723837"}}},
+        {"2", {{"base", "16"}, {"value", "1A228867F0CA"}}},
+        {"3", {{"base", "12"}, {"value", "32811A4AA0B7B"}}},
+        {"4", {{"base", "11"}, {"value", "917978721331A"}}},
+        {"5", {{"base", "16"}, {"value", "1A22886782E1"}}},
+        {"6", {{"base", "10"}, {"value", "28735619654702"}}},
+        {"7", {{"base", "14"}, {"value", "71AB5070CC4B"}}},
+        {"8", {{"base", "9"}, {"value", "122662581541670"}}},
+        {"9", {{"base", "8"}, {"value", "642121030037605"}}}
+    };
+
+    // Extract n and k from the input
+    int n = stoi(inputData["keys"]["n"]);
+    int k = stoi(inputData["keys"]["k"]);
+
+    // Map to store the decoded (x, y) points
+    map<int, long long> points;
+
+    // Decode the points
+    for (auto &entry : inputData) {
+        if (entry.first != "keys") {
+            int x = stoi(entry.first);
+            int base = stoi(entry.second["base"]);
+            string value = entry.second["value"];
+            long long y = decodeValue(value, base);
+            points[x] = y;
+        }
+    }
+
+    // Step 1: Use first 'k' points to construct the polynomial
+    map<int, long long> subsetPoints;
+    int count = 0;
+    for (auto &p : points) {
+        if (count < k) {
+            subsetPoints[p.first] = p.second;
+            count++;
+        } else {
+            break;
+        }
+    }
+
+    // Step 2: Check the remaining points
+    vector<int> incorrectRoots;
+    for (auto &p : points) {
+        if (subsetPoints.find(p.first) == subsetPoints.end()) {
+            // This point is not part of the subset, check if it satisfies the polynomial
+            int x = p.first;
+            long long y = p.second;
+            double estimatedY = lagrangeInterpolation(subsetPoints, x);
+
+            // Compare the estimated Y with the actual Y (with a small tolerance for floating-point errors)
+            if (abs(estimatedY - y) > 1e-6) {
+                incorrectRoots.push_back(x); // This is an incorrect root
+            }
+        }
+    }
+
+    // Output incorrect roots
+    if (incorrectRoots.empty()) {
+        cout << "All roots are correct." << endl;
+    } else {
+        cout << "Incorrect roots: ";
+        for (int root : incorrectRoots) {
+            cout << root << " ";
+        }
+        cout << endl;
     }
 
     return 0;
