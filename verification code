@@ -1,0 +1,26 @@
+#include <iostream>
+#include <vector>
+#include <cmath>
+
+// Function to check if a given point fits the polynomial
+bool checkFit(double polynomialConstant, int x, double y) {
+    // Here you should evaluate the polynomial at x and check if it matches y
+    // This is a placeholder for the actual implementation
+    return true; // Placeholder
+}
+
+int main() {
+    std::vector<int> x = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<double> y = {28735619723837, 7165654093362, 8348381700879, 481013014556258, 7165654153890, 28735619654702, 379086347222107, 343234514070110, 2897571638428741};
+
+    // Example of combination check (you need to generate all combinations and apply Lagrange interpolation)
+    // Here we should apply the polynomial and check remaining points
+    // This code just illustrates the point of verification
+    for (int i = 0; i < x.size(); ++i) {
+        if (!checkFit(0, x[i], y[i])) { // Replace 0 with actual polynomial constant
+            std::cout << "Potential incorrect root: (" << x[i] << ", " << y[i] << ")" << std::endl;
+        }
+    }
+
+    return 0;
+}
