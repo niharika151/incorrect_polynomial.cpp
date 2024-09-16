@@ -24,13 +24,29 @@ https://github.com/niharika151/incorrect_polynomial.cpp/blob/main/decode%20the%2
 
 
 (1,28735619723837)
+
+
 (2,7165654093362) (hexadecimal)
+
+
 (3,8348381700879) (base-12)
+
+
 (4,481013014556258) (base-11)
+
+
 (5,7165654153890) (hexadecimal)
+
+
 (6,28735619654702)
+
+
 (7,379086347222107) (base-14)
+
+
 (8,343234514070110) (base-9)
+
+
 (9,2897571638428741) (base-8)
 
 **Generate All Combinations**
