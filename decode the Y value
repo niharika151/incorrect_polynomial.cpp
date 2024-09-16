@@ -1,0 +1,47 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <map>
+#include <sstream>
+
+// Function to decode a value from a given base
+long long decodeValue(const std::string& value, int base) {
+    long long result = 0;
+    for (char c : value) {
+        result *= base;
+        if (c >= '0' && c <= '9') result += c - '0';
+        else result += c - 'A' + 10;
+    }
+    return result;
+}
+
+int main() {
+    std::map<int, std::pair<int, std::string>> roots = {
+        {1, {10, "28735619723837"}},
+        {2, {16, "1A228867F0CA"}},
+        {3, {12, "32811A4AA0B7B"}},
+        {4, {11, "917978721331A"}},
+        {5, {16, "1A22886782E1"}},
+        {6, {10, "28735619654702"}},
+        {7, {14, "71AB5070CC4B"}},
+        {8, {9, "122662581541670"}},
+        {9, {8, "642121030037605"}}
+    };
+
+    std::vector<int> x;
+    std::vector<double> y;
+
+    for (const auto& [key, val] : roots) {
+        int base = val.first;
+        std::string value = val.second;
+        x.push_back(key);
+        y.push_back(decodeValue(value, base));
+    }
+
+    // Print the decoded values
+    for (size_t i = 0; i < x.size(); ++i) {
+        std::cout << "x = " << x[i] << ", y = " << y[i] << std::endl;
+    }
+
+    return 0;
+}
